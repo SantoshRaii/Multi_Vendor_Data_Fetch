@@ -1,3 +1,51 @@
+# version: '3.8'
+
+# services:
+#   mongo:
+#     image: mongo
+#     container_name: mongo
+#     ports:
+#       - "27017:27017"
+
+#   redis:
+#     image: redis
+#     container_name: redis
+#     ports:
+#       - "6379:6379"
+
+#   api:
+#     build: .
+#     container_name: api
+#     depends_on:
+#       - mongo
+#       - redis
+#     ports:
+#       - "4000:4000"
+#     command: node api/index.js
+
+#   worker:
+#     build: .
+#     container_name: worker
+#     depends_on:
+#       - mongo
+#       - redis
+#     command: node worker/worker.js
+
+#   vendor-sync:
+#     build: .
+#     container_name: vendor-sync
+#     command: node mock-vendors/vendor-sync.js
+#     ports:
+#       - "6001:6001"
+
+#   vendor-async:
+#     build: .
+#     container_name: vendor-async
+#     command: node mock-vendors/vendor-async.js
+#     ports:
+#       - "6002:6002"
+
+
 version: '3.8'
 
 services:
@@ -22,6 +70,8 @@ services:
     ports:
       - "4000:4000"
     command: node api/index.js
+    env_file:
+      - .env   # 👈 Add this line
 
   worker:
     build: .
@@ -30,6 +80,8 @@ services:
       - mongo
       - redis
     command: node worker/worker.js
+    env_file:
+      - .env   # 👈 Add this line
 
   vendor-sync:
     build: .

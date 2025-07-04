@@ -2,8 +2,8 @@ import express from 'express';
 import mongoose, { model } from 'mongoose';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
-import Job from '../models/Job.js'; // 👈 import model
-import redisClient from '../utiles/redisClient.js'; // 👈 Add this line
+import Job from '../models/Job.js'; 
+import redisClient from '../utiles/redisClient.js'; 
 
 
 dotenv.config();
@@ -40,6 +40,8 @@ app.get('/jobs/:request_id', async (req, res) => {
 app.post('/jobs', async (req, res) => {
   try {
     const payload = req.body;
+    console.log("📥 Incoming job request");
+
     const request_id = uuidv4();
 
     // Choose vendor: for now just alternate randomly
@@ -50,9 +52,15 @@ app.post('/jobs', async (req, res) => {
       payload,
       vendor,
     });
-
-    await job.save();
-     await redisClient.xAdd('job-queue', '*', {
+    // console.log("✅ Job saved to MongoDB");
+      try {
+        await job.save();
+        console.log("✅ Job saved to MongoDB");
+      } catch (err) {
+        console.error("❌ Error saving job:", err.message);
+      }
+      
+      await redisClient.xAdd('job-queue', '*', {
       request_id,
       vendor,
     });
@@ -99,7 +107,6 @@ const PORT = process.env.PORT || 4000;
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then(() => {
     console.log('MongoDB connected');
